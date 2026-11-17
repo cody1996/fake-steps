@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>步数截图生成器</title>
+    <script>
+      // 启动兜底：脚本出错时把错误显示出来，而不是一片空白
+      (function () {
+        function show(msg) {
+          var mount = function () {
+            var el = document.createElement('pre');
+            el.style.cssText =
+              'position:fixed;left:0;top:0;right:0;max-height:60vh;overflow:auto;background:#fff;color:#b00;padding:14px;font:12px/1.6 monospace;white-space:pre-wrap;z-index:99999;margin:0;border-bottom:1px solid #f3c2c2';
+            el.textContent = ' 页面启动失败：\n\n' + msg;
+            document.body.insertBefore(el, document.body.firstChild);
+          };
+          if (document.body) mount();
+          else document.addEventListener('DOMContentLoaded', mount);
+        }
+        window.addEventListener('error', function (e) {
+          show((e.error && e.error.stack) || e.message || 'unknown error');
+        });
+        window.addEventListener('unhandledrejection', function (e) {
+          var r = e.reason;
+          show(r && (r.stack || r.message) ? String(r.stack || r.message) : String(r));
+        });
+      })();
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

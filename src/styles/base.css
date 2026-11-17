@@ -1,0 +1,41 @@
+@font-face {
+  font-family: 'StepFont';
+  src: url('../assets/fonts/HarmonyOS-SC-Regular-subset.ttf') format('truetype');
+  font-weight: 300 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'StepFont';
+  src: url('../assets/fonts/HarmonyOS-SC-Medium-subset.ttf') format('truetype');
+  font-weight: 500 600;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: 'StepFont';
+  src: url('../assets/fonts/HarmonyOS-SC-Bold-subset.ttf') format('truetype');
+  font-weight: 700 900;
+  font-style: normal;
+  font-display: block;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #f7f8fa;
+  color: #17181a;
+  font-family: 'StepFont', -apple-system, 'PingFang SC', 'HarmonyOS Sans SC', 'Microsoft YaHei', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}

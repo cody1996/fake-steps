@@ -1,0 +1,18 @@
+# 依赖与构建产物
+node_modules/
+dist/
+.pnpm-store/
+.vite/
+
+# 本地开发产物（截图、浏览器 profile、第三方字体源文件等）
+.dev/
+
+# 参考截图：第三方 App 界面，版权归原 App，不随仓库分发
+ref/
+refs/
+
+# 杂项
+*.log
+.DS_Store
+.vscode/
+.idea/
