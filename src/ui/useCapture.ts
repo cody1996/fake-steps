@@ -3,6 +3,7 @@ import type { DayRecord } from '../core/types';
 /** 与参考截图逐项对齐的「标本数据」，用于像素校准；不参与真实生成。 */
 export const REF_HISTORY: DayRecord = {
   date: '2026-04-10',
+  seed: 20260410,
   steps: 8742,
   goal: 10000,
   calories: 258,

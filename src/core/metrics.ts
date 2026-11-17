@@ -76,6 +76,7 @@ export function buildDayRecord(
 
   return {
     date,
+    seed,
     steps,
     goal,
     calories,

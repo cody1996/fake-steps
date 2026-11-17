@@ -110,7 +110,7 @@ function stepPreset(min: number, max: number) {
           </svg>
         </button>
       </div>
-      <p class="hint">相同参数 + 相同种子 = 完全相同的图片</p>
+      <p class="hint">相同参数 + 相同种子 = 完全相同的图片；种子每次打开页面随机生成，想复现就把它记下来。</p>
     </section>
 
     <button class="primary" @click="emit('generate')">

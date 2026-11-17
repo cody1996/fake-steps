@@ -2,6 +2,8 @@
 export interface DayRecord {
   /** 本地日期，YYYY-MM-DD */
   date: string;
+  /** 生成这条记录用的主种子，用于让轨迹等元素也随种子变化 */
+  seed: number;
   /** 当天步数 */
   steps: number;
   /** 目标步数 */

@@ -16,13 +16,16 @@ import DevicePreview from './DevicePreview.vue';
 
 const today = toISODate(new Date());
 
+/** 每次打开页面都换一个种子，避免所有人拿到同一批数字；想复现就把它记下来填回去 */
+const randomSeed = () => Math.floor(10000000 + Math.random() * 89999999);
+
 const form = reactive({
   start: today,
   end: today,
   minSteps: 5000,
   maxSteps: 8000,
   goal: 10000,
-  seed: 20260410,
+  seed: randomSeed(),
   includeToday: true,
 });
 
@@ -180,7 +183,7 @@ function generate() {
 }
 
 function reroll() {
-  form.seed = Math.floor(Math.random() * 1e8);
+  form.seed = randomSeed();
   generate();
 }
 

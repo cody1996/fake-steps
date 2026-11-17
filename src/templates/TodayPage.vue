@@ -27,7 +27,7 @@ import StatusBar from './parts/StatusBar.vue';
 
 const props = defineProps<{ record: DayRecord }>();
 
-const trace = computed(() => makeTrace(hashString(props.record.date) ^ 0x9e3779b9));
+const trace = computed(() => makeTrace((hashString(props.record.date) ^ props.record.seed) >>> 0));
 const dayOfMonth = computed(() => Number(props.record.date.slice(8, 10)));
 
 const CX = 196;
