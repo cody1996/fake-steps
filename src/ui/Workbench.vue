@@ -1,10 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, reactive, ref } from 'vue';
+import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { addDays, buildBatch, formatInt, monthDayLabel, toISODate, weekdayLabel } from '../core/batch';
 import type { ScheduledDay } from '../core/types';
 import { downloadBlob, renderPng } from '../export/render';
 import { exportZip } from '../export/zip';
-import { canShareImages, exportFiles, shareImages, type ExportProgress } from '../export/batch';
+import {
+  canShareImages,
+  downloadFiles,
+  renderFiles,
+  shareFiles,
+  type ExportProgress,
+} from '../export/batch';
 import ControlPanel from './ControlPanel.vue';
 import DevicePreview from './DevicePreview.vue';
 
@@ -86,36 +92,68 @@ async function exportAll() {
   }
 }
 
-/** 不打包，逐张保存 */
+/** 不打包，逐张保存；分享则必须先渲染缓存，再在第二次点击里同步调起系统面板 */
+const prepared = ref<{ key: string; files: File[] } | null>(null);
+const readyToShare = ref(false);
+
+const batchKey = computed(() =>
+  days.value.map((d) => `${d.record.date}-${d.record.steps}-${d.template}`).join('|'),
+);
+
+watch(batchKey, () => {
+  prepared.value = null;
+  readyToShare.value = false;
+});
+
+async function ensureFiles(): Promise<File[]> {
+  if (prepared.value && prepared.value.key === batchKey.value) return prepared.value.files;
+  const files = await renderFiles(days.value, (p) => {
+    progress.value = p;
+  });
+  prepared.value = { key: batchKey.value, files };
+  return files;
+}
+
 async function exportAsFiles() {
   if (!days.value.length || exporting.value) return;
   exporting.value = true;
   try {
-    await exportFiles(days.value, (p) => {
-      progress.value = p;
-    });
+    const files = await ensureFiles();
+    downloadFiles(files);
   } finally {
     exporting.value = false;
     progress.value = null;
   }
 }
 
-/** 调系统分享面板，一次把多张图发到相册 / 聊天工具 */
+/**
+ * 系统分享面板要求调用发生在「用户手势」内，而渲染 N 张图要好几秒。
+ * 所以第一次点击只负责把图渲染好，按钮变成「分享 N 张到相册」，再点一次才是真正的 share()。
+ */
 async function exportAsShare() {
   if (!days.value.length || exporting.value) return;
-  exporting.value = true;
-  try {
-    await shareImages(days.value, (p) => {
-      progress.value = p;
-    });
-  } catch (e) {
-    // 用户取消分享不算错误
-    if (!String(e).includes('AbortError')) {
-      window.alert(String(e).replace('Error: ', ''));
+
+  if (!prepared.value || prepared.value.key !== batchKey.value) {
+    exporting.value = true;
+    try {
+      await ensureFiles();
+      readyToShare.value = true;
+    } finally {
+      exporting.value = false;
+      progress.value = null;
     }
-  } finally {
-    exporting.value = false;
-    progress.value = null;
+    return;
+  }
+
+  // 这里必须是同步的第一句，不能有 await
+  try {
+    await shareFiles(prepared.value.files);
+    readyToShare.value = false;
+  } catch (e) {
+    const err = e as Error;
+    if (err?.name !== 'AbortError') {
+      window.alert(err?.message || String(e));
+    }
   }
 }
 
@@ -242,17 +280,25 @@ onUnmounted(() => {
               <button
                 v-if="shareSupported"
                 class="dl ghost"
+                :class="{ ready: readyToShare }"
                 :disabled="exporting || !days.length"
                 @click="exportAsShare"
               >
-                存到相册
+                {{ readyToShare ? `分享 ${days.length} 张到相册` : '存到相册' }}
               </button>
               <button class="dl ghost zip" :disabled="exporting || !days.length" @click="exportAll">
                 ZIP
               </button>
             </div>
-            <p v-if="isMobile" class="m-hint">
-              「逐张保存」会连续存进相册或下载目录；iOS 建议用「存到相册」，可一次性存多张。
+            <p v-if="shareSupported" class="m-hint">
+              {{
+                readyToShare
+                  ? `已渲染好 ${days.length} 张，再点一次「分享」即可存入相册。`
+                  : '「存到相册」会先渲染图片，再点一次才会弹出系统分享面板（浏览器要求分享必须由点击直接触发）。'
+              }}
+            </p>
+            <p v-else-if="isMobile" class="m-hint">
+              「逐张保存」会连续存进相册或下载目录；当前浏览器不支持系统分享面板。
             </p>
 
             <div v-if="progress" class="progress">
@@ -442,6 +488,11 @@ onUnmounted(() => {
 .dl:disabled {
   opacity: 0.45;
   cursor: default;
+}
+.dl.ready {
+  background: #14161a;
+  color: #fff;
+  border-color: #14161a;
 }
 .progress {
   position: relative;
