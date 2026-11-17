@@ -13,6 +13,7 @@ import {
 } from '../export/batch';
 import ControlPanel from './ControlPanel.vue';
 import DevicePreview from './DevicePreview.vue';
+import GitHubStar from './GitHubStar.vue';
 
 const today = toISODate(new Date());
 
@@ -237,6 +238,7 @@ onUnmounted(() => {
         </div>
       </div>
       <div class="head-right">
+        <GitHubStar />
         <button v-if="isMobile" class="params-btn" @click="panelOpen = !panelOpen">
           {{ panelOpen ? '收起参数' : '参数' }}
         </button>

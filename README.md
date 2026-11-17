@@ -50,6 +50,7 @@ pnpm dev         # 开发预览 http://localhost:5173
 pnpm build       # 产出 dist/（纯静态，可托管到任意服务器）
 pnpm preview     # 本地预览构建产物 http://localhost:4173
 pnpm test        # 运行核心算法单测
+pnpm typecheck   # vue-tsc 类型检查
 ```
 
 > 构建产物是 ES Module，需要通过 HTTP 访问；`pnpm preview` 或任意静态服务器（Nginx / OSS / GitHub Pages）都能直接跑。
