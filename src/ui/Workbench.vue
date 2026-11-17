@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue';
+import { SlidersHorizontal } from 'lucide-vue-next';
 import { addDays, buildBatch, formatInt, monthDayLabel, toISODate, weekdayLabel } from '../core/batch';
 import type { ScheduledDay } from '../core/types';
 import { downloadBlob, renderPng } from '../export/render';
@@ -239,8 +240,14 @@ onUnmounted(() => {
       </div>
       <div class="head-right">
         <GitHubStar />
-        <button v-if="isMobile" class="params-btn" @click="panelOpen = !panelOpen">
-          {{ panelOpen ? '收起参数' : '参数' }}
+        <button
+          v-if="isMobile"
+          class="params-btn"
+          :class="{ 'is-open': panelOpen }"
+          @click="panelOpen = !panelOpen"
+        >
+          <SlidersHorizontal :size="15" :stroke-width="2" />
+          {{ panelOpen ? '收起' : '自定义' }}
         </button>
         <span v-else class="state">历史页 + 今日页已还原 · 可导出 PNG / ZIP</span>
       </div>
@@ -360,6 +367,10 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
+}
+.titles {
+  min-width: 0;
 }
 .mark {
   width: 32px;
@@ -374,6 +385,9 @@ onUnmounted(() => {
   display: block;
   font-size: 15px;
   letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .titles small {
   display: block;
@@ -602,14 +616,24 @@ onUnmounted(() => {
   gap: 10px;
 }
 .params-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
   height: 34px;
-  padding: 0 14px;
-  border: 1px solid #e2e5ea;
+  padding: 0 13px;
+  border: 1px solid #14161a;
   border-radius: 9px;
+  background: #14161a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.params-btn.is-open {
   background: #fff;
   color: #14161a;
-  font-size: 13px;
-  cursor: pointer;
+  border-color: #e2e5ea;
 }
 .m-hint {
   margin: 2px 0 0;

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { PhGithubLogo } from '@phosphor-icons/vue';
+import { PhStar } from '@phosphor-icons/vue';
 
 const REPO = 'https://github.com/cody1996/fake-steps';
 const stars = ref<number | null>(null);
@@ -22,7 +22,7 @@ onMounted(async () => {
 
 <template>
   <a class="gh-star" :href="REPO" target="_blank" rel="noopener noreferrer" title="在 GitHub 上 Star 这个项目">
-    <PhGithubLogo :size="16" weight="fill" />
+    <PhStar :size="15" weight="fill" class="star-icon" />
     <span class="label">Star</span>
     <span v-if="stars !== null" class="count">{{ stars }}</span>
   </a>
@@ -48,10 +48,10 @@ onMounted(async () => {
   background: #f7f8fa;
   border-color: #c9ced6;
 }
+.star-icon {
+  color: #f5a524;
+}
 .count {
-  padding-left: 6px;
-  margin-left: 1px;
-  border-left: 1px solid #e8eaee;
   font-weight: 500;
   color: #6b7280;
   font-variant-numeric: tabular-nums;
