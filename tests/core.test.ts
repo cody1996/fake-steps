@@ -37,6 +37,26 @@ describe('指标换算', () => {
     }
   });
 
+  it('今天这一页的状态栏时间不会晚于生成时刻', () => {
+    const now = new Date(2026, 10, 18, 9, 30, 0);
+    for (let i = 0; i < 50; i += 1) {
+      const r = buildDayRecord('2026-11-18', 6000, 10000, 1000 + i, now);
+      const [h, m] = r.clock.split(':').map(Number);
+      expect(h * 60 + m).toBeLessThanOrEqual(9 * 60 + 30);
+      expect(h * 60 + m).toBeGreaterThanOrEqual(1 * 60 + 30);
+    }
+  });
+
+  it('历史日期的时间不受当前时刻限制', () => {
+    const now = new Date(2026, 10, 18, 7, 0, 0);
+    const clocks = new Set<string>();
+    for (let i = 0; i < 30; i += 1) {
+      clocks.add(buildDayRecord('2026-04-10', 6000, 10000, 2000 + i, now).clock);
+    }
+    // 会出现晚于 07:00 的时间
+    expect([...clocks].some((c) => Number(c.split(':')[0]) > 7)).toBe(true);
+  });
+
   it('同一 seed + 同一天，结果完全一致', () => {
     const a = buildDayRecord('2026-04-10', 8742, 10000, 7);
     const b = buildDayRecord('2026-04-10', 8742, 10000, 7);

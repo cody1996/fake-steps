@@ -162,8 +162,34 @@ async function exportAsShare() {
   }
 }
 
+/** 凌晨生成「今天」会显得很假，只提醒一次 */
+const earlyAsked = ref(false);
+const EARLY_HOUR = 6;
+
 function generate() {
   busy.value = true;
+
+  const now = new Date();
+  if (
+    form.includeToday &&
+    form.end >= today &&
+    !earlyAsked.value &&
+    now.getHours() < EARLY_HOUR
+  ) {
+    earlyAsked.value = true;
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mm = String(now.getMinutes()).padStart(2, '0');
+    const keepToday = window.confirm(
+      `现在是 ${hh}:${mm}，这个点生成「今天」的步数页会显得很假。\n\n` +
+        `点「确定」仍然包含今天；点「取消」则只生成到昨天。`,
+    );
+    if (!keepToday) {
+      form.includeToday = false;
+      form.end = addDays(today, -1);
+      if (form.start > form.end) form.start = form.end;
+    }
+  }
+
   const lastAllowed = form.includeToday ? today : addDays(today, -1);
   let end = form.end > lastAllowed ? lastAllowed : form.end;
   let start = form.start > end ? end : form.start;

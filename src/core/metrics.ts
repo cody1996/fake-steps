@@ -71,8 +71,13 @@ export function buildDayRecord(
   const fatLossKg = randInt(rand, 3, 8);
   const workoutKm = Math.round(randInt(rand, 30, 800) / 100);
   const bedH = randInt(rand, 22, 24);
-  const clockH = randInt(rand, 8, 21);
-  const clockM = randInt(rand, 0, 59);
+
+  // 状态栏时间：今天这一页不能晚于「生成时刻」，其余日期随便取白天时间
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  const isToday = date === `${now.getFullYear()}-${pad2(now.getMonth() + 1)}-${pad2(now.getDate())}`;
+  const clockMinutes = isToday
+    ? randInt(rand, Math.max(0, nowMinutes - 8 * 60), nowMinutes)
+    : randInt(rand, 8 * 60, 21 * 60 + 59);
 
   return {
     date,
@@ -92,7 +97,7 @@ export function buildDayRecord(
     heartRate,
     fatLossKg,
     bedTime: `${pad2(bedH % 24)}:${pad2(randInt(rand, 0, 1) * 30)}`,
-    clock: `${pad2(clockH)}:${pad2(clockM)}`,
+    clock: `${pad2(Math.floor(clockMinutes / 60))}:${pad2(clockMinutes % 60)}`,
     battery: randInt(rand, 85, 99),
   };
 }
